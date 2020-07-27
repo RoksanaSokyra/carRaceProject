@@ -260,6 +260,11 @@ namespace RaceSimulator
 
         private void ReadOwner()
         {
+            foreach (Owner owner in _ownerService.GetOwners())
+            {
+                Console.WriteLine($"Name: {owner.Name} ID: {owner.Id}");
+            }
+
             string result;
             int id;
             Console.WriteLine("Please provide owner id");
@@ -296,6 +301,12 @@ namespace RaceSimulator
 
         private void ReadCar()
         {
+            foreach (Car car in _carService.GetCars())
+            {
+                Console.WriteLine($"Name: {car.Name} ID: {car.Id}");
+            }
+            Console.WriteLine();
+
             string result;
             int id;
             Console.WriteLine("Please provide car id");
@@ -327,6 +338,10 @@ namespace RaceSimulator
         }
         private void ReadDriver()
         {
+            foreach (Driver driver in _driverService.GetDrivers())
+            {
+                Console.WriteLine($"Name: {driver.Name} ID: {driver.Id}");
+            }
             string result;
             int id;
             Console.WriteLine("Please provide driver id");
@@ -358,6 +373,13 @@ namespace RaceSimulator
         }
         private void UpdateOwner()
         {
+            var owners = _ownerService.GetOwners();
+            foreach (Owner owner in owners)
+            {
+                Console.WriteLine($"Name: {owner.Name} ID: {owner.Id}");
+            }
+            Console.WriteLine();
+
             Console.WriteLine("Please provide owner name");
             string ownerName = Console.ReadLine();
             while (string.IsNullOrEmpty(ownerName))
@@ -365,11 +387,18 @@ namespace RaceSimulator
                 Console.WriteLine("Not a valid value. Try again");
                 ownerName = Console.ReadLine();
             }
-            Owner owner = new Owner(ownerName);
-            _ownerService.UpdateOwner(owner);
+            Owner updatedOwner = new Owner(ownerName);
+            _ownerService.UpdateOwner(updatedOwner);
         }
         private void UpdateCar()
         {
+            var cars = _carService.GetCars();
+            foreach (Car car in cars)
+            {
+                Console.WriteLine($"Name: {car.Name} ID: {car.Id}");
+            }
+            Console.WriteLine();
+
             string result;
             int carId, horsePower;
             string name;
@@ -414,11 +443,18 @@ namespace RaceSimulator
                 result = Console.ReadLine();
             }
 
-            Car car = new Car(name, weight, horsePower, manuverability) { Id = carId }; //przypisujemy id czy obiekt?
-            _carService.UpdateCar(car);
+            Car updatedCar = new Car(name, weight, horsePower, manuverability) { Id = carId }; //przypisujemy id czy obiekt?
+            _carService.UpdateCar(updatedCar);
         }
         private void UpdateDriver()
         {
+            var drivers = _driverService.GetDrivers();
+            foreach (Driver driver in drivers)
+            {
+                Console.WriteLine($"Name: {driver.Name} ID: {driver.Id}");
+            }
+            Console.WriteLine();
+
             string result;
             int driverId, age;
             string name;
@@ -461,8 +497,8 @@ namespace RaceSimulator
                 result = Console.ReadLine();
             }
 
-            Driver driver = new Driver(name, age, skillLevel, staminaLevel) { Id = driverId };
-            _driverService.UpdateDriver(driver);
+            Driver updatedDriver = new Driver(name, age, skillLevel, staminaLevel) { Id = driverId };
+            _driverService.UpdateDriver(updatedDriver);
         }
         private void DeleteOwner()
         {
@@ -471,6 +507,7 @@ namespace RaceSimulator
             {
                 Console.WriteLine($"Name: {owner.Name} ID: {owner.Id}");
             }
+            Console.WriteLine();
             Console.WriteLine("Please provide owner id");
             int id = Convert.ToInt32(Console.ReadLine());
             _ownerService.DeleteOwner(id);
@@ -482,6 +519,7 @@ namespace RaceSimulator
             {
                 Console.WriteLine($"Name: {driver.Name} ID: {driver.Id}");
             }
+            Console.WriteLine();
             Console.WriteLine("Please provide driver id");
             int id = Convert.ToInt32(Console.ReadLine());
             _driverService.DeleteDriver(id);
@@ -493,6 +531,7 @@ namespace RaceSimulator
             {
                 Console.WriteLine($"Name: {car.Name} ID: {car.Id}");
             }
+            Console.WriteLine();
             Console.WriteLine("Please provide car id");
             int id = Convert.ToInt32(Console.ReadLine());
             _carService.DeleteCar(id);

@@ -29,7 +29,7 @@ namespace RaceSimulator.Services
 
         public int CreateCar(Car car)
         {
-            var owner = _context.Owners.Include(owner => owner.Cars).SingleOrDefault(x => x.Id == car.Id);
+            var owner = _context.Owners.Include(owner => owner.Cars).SingleOrDefault(x => x.Id == car.OwnerID);
             if (owner == null)
             {
                 throw new Exception("Owner not found");
