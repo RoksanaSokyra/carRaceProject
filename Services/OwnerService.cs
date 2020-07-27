@@ -10,9 +10,11 @@ namespace RaceSimulator.Services
 {
     public interface IOwnerService
     {
-        void CreateOwner(string name);
+        int CreateOwner(Owner owner);
+        Owner GetOwner(int id);
+        ICollection<Owner> GetOwners();
+        Owner UpdateOwner(Owner owner);
         void DeleteOwner(int id);
-        void ReadOwnersInfo(int id);
     }
     class OwnerService : IOwnerService
     {
@@ -23,45 +25,41 @@ namespace RaceSimulator.Services
             _context = context;
         }
 
-        public void CreateOwner(string name)
+        public int CreateOwner(Owner owner)
         {
-            Owner owner = new Owner(name);
-            owner.Cars = new List<Car>();
-            owner.Drivers = new List<Driver>();
             _context.Owners.Add(owner);
             _context.SaveChanges();
+            return owner.Id;
         }
-        public void ReadOwnersInfo(int id)
-        { //czy wywolywac metody service z pozostalych, jesli tak jak wywolywac service
-            var owner = _context.Owners.Include(owner => owner.Cars).Include(owner => owner.Drivers).SingleOrDefault(x => x.Id == id);
+        public Owner GetOwner(int id)
+        {
+            var owner = _context.Owners.Include(owner => owner.Cars).Include(owner => owner.Drivers)
+                .SingleOrDefault(owner => owner.Id == id);
             if (owner == null)
             {
-                throw new Exception("Driver not found");
+                throw new Exception("Car not found");
             }
-            Console.WriteLine($"Id: {owner.Id}");
-            Console.WriteLine($"Name: {owner.Name}");
-            foreach (Car car in owner.Cars)
-            {
-                Console.WriteLine($"Id: {car.Id}");
-                Console.WriteLine($"OwnerID: {car.OwnerID}");
-                Console.WriteLine($"Name: {car.Name}");
-                Console.WriteLine($"Weight in kg: {car.WeightInKg}");
-                Console.WriteLine($"Horse power: {car.HorsePower}");
-                Console.WriteLine($"Maneuverability level: {car.ManeuverabilityLevel}");
-            }
-            foreach (Driver driver in owner.Drivers)
-            {
-                Console.WriteLine($"Id: {driver.Id}");
-                Console.WriteLine($"OwnerID: {driver.OwnerId}");
-                Console.WriteLine($"Name: {driver.Name}");
-                Console.WriteLine($"Age: {driver.Age}");
-                Console.WriteLine($"Skill level: {driver.SkillLevel}");
-                Console.WriteLine($"Stamina level: {driver.StaminaLevel}");
-            }
+            return owner;
+        }
+        public ICollection<Owner> GetOwners()
+        {
+            return _context.Owners.Include(owner => owner.Cars).Include(owner => owner.Drivers).ToList<Owner>();
+        }
+       
+        public Owner UpdateOwner(Owner ownerParam)
+        {
+            var owner = _context.Owners.SingleOrDefault(owner => owner.Id == ownerParam.Id);
+            owner.Name = ownerParam.Name;
+            if (owner == null)
+                throw new Exception("Owner not found");
+
+            _context.Owners.Update(owner);
+            _context.SaveChanges();
+            return owner;
         }
         public void DeleteOwner(int id)
         {
-            var owner = _context.Owners.Find(id);
+            var owner = _context.Owners.SingleOrDefault(owner => owner.Id == id);
             if (owner != null)
             {
                 _context.Owners.Remove(owner);

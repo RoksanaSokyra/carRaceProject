@@ -10,8 +10,10 @@ namespace RaceSimulator.Services
 {
     public interface IDriverService
     {
-        void CreateDriver(int ownerId, string name, int age, double skillLevel, double staminaLevel);
-        void ReadDriverInfo(int id);
+        int CreateDriver(Driver driver);
+        Driver GetDriver(int id);
+        ICollection<Driver> GetDrivers();
+        Driver UpdateDriver(Driver driver);
         void DeleteDriver(int id);
     }
     class DriverService : IDriverService
@@ -23,37 +25,55 @@ namespace RaceSimulator.Services
             _context = context;
         }
 
-        public void CreateDriver(int ownerId, string name, int age, double skillLevel, double staminaLevel)
+        public int CreateDriver(Driver driver)
         {
-            var owner = _context.Owners.Include(owner => owner.Drivers).SingleOrDefault(x => x.Id == ownerId);
-            Driver driver = new Driver(name, age, skillLevel, staminaLevel);
-            owner.Drivers.Add(driver);
+            var owner = _context.Owners.Include(owner => owner.Drivers).SingleOrDefault(x => x.Id == driver.OwnerId);
+            if (owner == null)
+            {
+                throw new Exception("Owner not found");
+            }
+            owner.Drivers.Add(driver); 
             _context.SaveChanges();
+            return driver.Id;
         }
 
-        public void ReadDriverInfo(int id)
+        public Driver GetDriver(int id)
         {
-            var driver = _context.Drivers.SingleOrDefault(x => x.Id == id);
+            var driver = _context.Drivers.SingleOrDefault(driver => driver.Id == id);
             if (driver == null)
             {
                 throw new Exception("Driver not found");
             }
-            Console.WriteLine($"Id: {driver.Id}");
-            Console.WriteLine($"OwnerID: {driver.OwnerId}");
-            Console.WriteLine($"Name: {driver.Name}");
-            Console.WriteLine($"Age: {driver.Age}");
-            Console.WriteLine($"Skill level: {driver.SkillLevel}");
-            Console.WriteLine($"Stamina level: {driver.StaminaLevel}");
+            return driver;
+        }
+        public ICollection<Driver> GetDrivers() //czy spr czy drivers null, czy empty czy nic
+        {
+            return _context.Drivers.ToList<Driver>();
         }
 
+        public Driver UpdateDriver(Driver driverParam)
+        {
+            var driver = _context.Drivers.SingleOrDefault(driver => driver.Id == driverParam.Id);
+            driver.Name = driverParam.Name;
+            driver.Age = driverParam.Age;
+            driver.SkillLevel = driverParam.SkillLevel;
+            driver.StaminaLevel = driverParam.StaminaLevel;
+            if (driver == null)
+                throw new Exception("Driver not found");
+
+            _context.Drivers.Update(driver);
+            _context.SaveChanges();
+            return driver;
+        }
         public void DeleteDriver(int id)
         {
-            var driver = _context.Drivers.Find(id);
-            if (driver != null)
+            var driver = _context.Drivers.SingleOrDefault(driver => driver.Id == id); //przetestowac. czy powinien byc include?
+            if (driver == null)
             {
-                _context.Drivers.Remove(driver);
-                _context.SaveChanges();
+                throw new Exception("Driver not found");
             }
+            _context.Drivers.Remove(driver);
+            _context.SaveChanges();
         }
     }
 }
